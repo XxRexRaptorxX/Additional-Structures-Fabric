@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "additionalstructures",
+  "version": "3.0.2",
+
+  "name": "Additional Structures",
+  "description": "This mod adds a lot new small and medium sized structures into the game to expand your world!",
+  "authors": [
+    "XxRexRaptorxX"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/additional-structures",
+    "sources": "https://github.com/XxRexRaptorxX/Additional-Structures"
+  },
+
+  "license": "All rights reserved.",
+  "icon": "assets/additionalstructures/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "xxrexraptorxx.additionalstructures.AdditionalStructures"
+    ]
+  },
+  "mixins": [
+    "additionalstructures.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.13.3",
+    "fabric": "*",
+    "minecraft": "1.18.x",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
