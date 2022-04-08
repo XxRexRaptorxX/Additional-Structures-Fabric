@@ -22,9 +22,6 @@
       "xxrexraptorxx.additionalstructures.AdditionalStructures"
     ]
   },
-  "mixins": [
-    "additionalstructures.mixins.json"
-  ],
 
   "depends": {
     "fabricloader": ">=0.13.3",
