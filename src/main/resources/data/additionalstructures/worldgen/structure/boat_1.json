@@ -1,6 +1,6 @@
 {
   "start_pool": "additionalstructures:boat_1",
-  "biomes": "#minecraft:is_ocean",
+  "biomes": "#c:ocean",
   "adapt_noise": false,
   "type": "minecraft:jigsaw",
   "step": "surface_structures",
