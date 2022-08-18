@@ -4,7 +4,7 @@
     "start_pool": "additionalstructures:bush_1",
     "size": 1
   },
-  "biomes": "#minecraft:is_forest",
+  "biomes": "#c:forest",
   "adapt_noise": true,
   "spawn_overrides": {}
 }

@@ -4,7 +4,7 @@
     "start_pool": "additionalstructures:big_jungle_log",
     "size": 1
   },
-  "biomes": "#minecraft:is_jungle",
+  "biomes": "#c:jungle",
   "adapt_noise": true,
   "spawn_overrides": {}
 }
