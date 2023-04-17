@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "additionalstructures",
-  "version": "4.1.1",
+  "version": "${version}",
 
   "name": "Additional Structures",
   "description": "This mod adds a lot new small and medium sized structures into the game to expand your world!",
@@ -11,6 +11,13 @@
   "contact": {
     "homepage": "https://www.curseforge.com/minecraft/mc-mods/additional-structures-fabric",
     "sources": "https://github.com/XxRexRaptorxX/Additional-Structures-Fabric"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "https://discord.com/invite/ycRJJk8EXV"
+      }
+    }
   },
 
   "license": "All rights reserved.",
