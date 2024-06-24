@@ -1,6 +1,6 @@
 {
   "start_pool": "additionalstructures:tower_2",
-  "biomes": "#c:extreme_hills",
+  "biomes": "#c:is_mountain",
   "type": "minecraft:jigsaw",
   "step": "surface_structures",
   "project_start_to_heightmap": "WORLD_SURFACE_WG",

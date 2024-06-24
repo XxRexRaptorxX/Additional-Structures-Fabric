@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "additionalstructures",
-  "version": "${version}",
-  "name": "Additional Structures",
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
   "description": "This mod adds a lot new small and medium sized structures into the game to expand your world!",
   "authors": [
     "XxRexRaptorxX"
@@ -30,10 +30,10 @@
   },
 
   "depends": {
-    "fabricloader": ">=0.14.21",
-    "fabric": "*",
-    "minecraft": "~1.20",
-    "java": ">=17"
+    "fabricloader": "${fabric_version_range}",
+    "minecraft": "${mc_version_range}",
+    "java": "${java_version_range}",
+    "fabric-api": "*"
   },
   "suggests": {
     "another-mod": "*"
