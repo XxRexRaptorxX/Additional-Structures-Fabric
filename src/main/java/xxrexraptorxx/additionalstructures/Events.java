@@ -14,6 +14,14 @@ import java.nio.file.Path;
 
 public class Events {
 
+    /**
+     * @author XxRexRaptorxX (RexRaptor)
+     *
+     * When entering a new MC installation for the first time, a message appears informing about the risks of mod reposts.
+     * Then generates a marker file in the configs folder with more details. Supports implementation in multiple mods.
+     *
+     * You are welcome to implement this method in your own mods!
+     */
     public static void register() {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             ServerPlayerEntity player = handler.getPlayer();
