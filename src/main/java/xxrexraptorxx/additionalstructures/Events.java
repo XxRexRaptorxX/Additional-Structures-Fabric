@@ -83,7 +83,7 @@ public class Events {
 
                     // Nachrichten an den Spieler schicken
                     player.sendMessage(Text.literal("Important Information about mod reposts:\n").styled(style -> style.withUnderline(true).withColor(Formatting.DARK_RED)), false);
-                    player.sendMessage(Text.literal("Sites like 9minecraft.net, mc-mod.net, etc. are known for reuploading mod files without permissions.\nThese sites will also contain a bunch of ads, to try to make money from mods they did not create.\n").styled(style -> style.withColor(0xFF5555)), false);
+                    player.sendMessage(Text.literal("Sites like 9minecraft.net, mc-mod.net, etc. are known for reuploading mod files without permissions.\nThese sites will also contain a bunch of ads, to try to make money from mods they did not create.\n").styled(style -> style.withColor(Formatting.RED)), false);
                     player.sendMessage(Text.literal("For you, this can mean any of the following:").styled(style -> style.withUnderline(true).withColor(Formatting.RED)), false);
                     player.sendMessage(Text.literal("- Modified versions of mods, which may contain malware & viruses").styled(style -> style.withColor(Formatting.RED)), false);
                     player.sendMessage(Text.literal("- Having your information stolen from malicious ads").styled(style -> style.withColor(Formatting.RED)), false);
