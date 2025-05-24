@@ -2,10 +2,12 @@ package xxrexraptorxx.additionalstructures;
 
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.impl.launch.FabricLauncher;
 import net.fabricmc.loader.impl.launch.FabricLauncherBase;
+import net.minecraft.component.Component;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -86,19 +88,21 @@ public class Events {
 
                     if (!launcher.contains("curseforge") || !launcher.contains("modrinth") || !launcher.contains("prism")) {
                         AdditionalStructures.LOGGER.info("Stop-mod-reposts info message is generated. Don't worry, this message should only appear the very first time after installation!");
-                        player.sendMessage(Text.literal("Important Information about mod reposts:\n").styled(style -> style.withUnderline(true).withColor(Formatting.DARK_RED)), false);
-                        player.sendMessage(Text.literal("Sites like 9minecraft.net, mc-mod.net, etc. are known for reuploading mod files without permissions.\nThese sites will also contain a bunch of ads, to try to make money from mods they did not create.\n").styled(style -> style.withColor(Formatting.RED)), false);
-                        player.sendMessage(Text.literal("For you, this can mean any of the following:").styled(style -> style.withUnderline(true).withColor(Formatting.RED)), false);
-                        player.sendMessage(Text.literal("- Modified versions of mods, which may contain malware & viruses").styled(style -> style.withColor(Formatting.RED)), false);
-                        player.sendMessage(Text.literal("- Having your information stolen from malicious ads").styled(style -> style.withColor(Formatting.RED)), false);
-                        player.sendMessage(Text.literal("- Old and broken mod versions that can corrupt your world").styled(style -> style.withColor(Formatting.RED)), false);
+                        player.sendMessage(Text.literal("<-------------------------------------------------->").setStyle(Style.EMPTY.withColor(Formatting.RED)), false);
+                        player.sendMessage(Text.literal("Important Information about mod reposts:\n").setStyle(Style.EMPTY.withUnderline(true).withColor(Formatting.DARK_RED)), false);
+                        player.sendMessage(Text.literal("Sites like 9minecraft.net, mc-mod.net, etc. are known for reuploading mod files without permissions.\nThese sites will also contain a bunch of ads, to try to make money from mods they did not create.\n").setStyle(Style.EMPTY.withColor(Formatting.RED)), false);
+                        player.sendMessage(Text.literal("For you, this can mean any of the following:").setStyle(Style.EMPTY.withUnderline(true).withColor(Formatting.DARK_RED)), false);
+                        player.sendMessage(Text.literal("- Modified versions of mods, which may contain malware & viruses").setStyle(Style.EMPTY.withColor(Formatting.RED)), false);
+                        player.sendMessage(Text.literal("- Having your information stolen from malicious ads").setStyle(Style.EMPTY.withColor(Formatting.RED)), false);
+                        player.sendMessage(Text.literal("- Old and broken mod versions that can corrupt your world").setStyle(Style.EMPTY.withColor(Formatting.RED)), false);
                         player.sendMessage(Text.literal("- Taking money and views away from the real authors, which may cause them to stop making mods").styled(style -> style.withColor(Formatting.RED)), false);
+                        player.sendMessage(Text.empty());
 
-                        player.sendMessage(
-                                Text.literal("* Click here for more information *")
-                                        .styled(style -> style.withColor(Formatting.GOLD).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://vazkii.net/repost/"))),
-                                false
-                        );
+                        player.sendMessage(Text.literal("* Click here for more information *").setStyle(Style.EMPTY.withColor(Formatting.GOLD).withClickEvent(
+                                new ClickEvent(ClickEvent.Action.OPEN_URL, "https://vazkii.net/repost/")).withHoverEvent(
+                                new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("?").setStyle(Style.EMPTY.withColor(Formatting.GRAY))))),false);
+
+                        player.sendMessage(Text.literal("<-------------------------------------------------->").setStyle(Style.EMPTY.withColor(Formatting.RED)), false);
                     }
                 }
             } catch (IOException e) {
