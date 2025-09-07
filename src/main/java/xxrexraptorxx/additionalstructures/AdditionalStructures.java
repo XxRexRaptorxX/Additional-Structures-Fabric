@@ -14,7 +14,6 @@ public class AdditionalStructures implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		Events.register();
 	}
 
 }
