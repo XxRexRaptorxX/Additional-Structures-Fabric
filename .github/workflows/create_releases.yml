@@ -1,4 +1,4 @@
-name: Create previous-version Dev release
+name: Create releases
 
 on:
   push:
@@ -15,6 +15,51 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Read mod name from gradle.properties
+        id: get_mod_name
+        run: |
+          MOD_NAME=$(grep "^mod_name=" gradle.properties | cut -d'=' -f2)
+          echo "mod_name=$MOD_NAME" >> $GITHUB_OUTPUT
+
+      - name: Build image and page URL from repo with fallbacks
+        id: get_repository_content
+        run: |
+          REPO="${{ github.repository }}"
+          PATH="src/main/resources/logo.png"
+          FALLBACK_PAGE="https://github.com/XxRexRaptorxX?tab=repositories"
+          FALLBACK_IMAGE="https://raw.githubusercontent.com/XxRexRaptorxX/General/main/icons/profile_pic.png"
+
+          if [ -f "${GITHUB_WORKSPACE}/${PATH}" ]; then
+            RAW_URL="https://raw.githubusercontent.com/${REPO}/${{ github.sha }}/${PATH}"
+            echo "image_url=${RAW_URL}" >> $GITHUB_OUTPUT
+            echo "page_url=https://github.com/${REPO}" >> $GITHUB_OUTPUT
+          else
+            echo "image_url=${FALLBACK_IMAGE}" >> $GITHUB_OUTPUT
+            echo "page_url=${FALLBACK_PAGE}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Show resolved image & page URL
+        run: |
+          echo "-> image_url: ${{ steps.get_repository_content.outputs.image_url }}"
+          echo "-> page_url : ${{ steps.get_repository_content.outputs.page_url }}"
+
+      - name: Send Discord message
+        id: send_discord
+        uses: sarisia/actions-status-discord@v1
+        if: >
+          github.event.head_commit &&
+          (startsWith(github.event.head_commit.message, 'feat') ||
+            startsWith(github.event.head_commit.message, 'fix') ||
+            startsWith(github.event.head_commit.message, 'refactor'))
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          title: "New ${{ steps.get_mod_name.outputs.mod_name }} stuff is coming soon!"
+          url: ${{ steps.get_repository_content.outputs.page_url }}
+          image: ${{ steps.get_repository_content.outputs.image_url }}
+          username: Villager News
+          avatar_url: "https://github.com/XxRexRaptorxX/General/blob/main/page_decorations/villager_news.png?raw=true"
+          noprefix: true
 
       - name: Create release containing previous version's Dev tags
         uses: actions/github-script@v7
