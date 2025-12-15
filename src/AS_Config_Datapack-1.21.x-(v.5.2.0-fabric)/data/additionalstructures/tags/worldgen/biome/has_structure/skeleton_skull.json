@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "#c:is_badlands",
+    "#c:is_wasteland",
+    "#additionalstructures:end_safe_placement"
+  ]
+}
