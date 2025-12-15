@@ -18,17 +18,14 @@
       }
     }
   },
-
   "license": "All rights reserved.",
   "icon": "assets/additionalstructures/icon.png",
-
   "environment": "*",
   "entrypoints": {
     "main": [
       "xxrexraptorxx.additionalstructures.AdditionalStructures"
     ]
   },
-
   "depends": {
     "fabricloader": "${fabric_version_range}",
     "minecraft": "${minecraft_version_range}",

@@ -10,10 +10,9 @@ import org.slf4j.LoggerFactory;
  **/
 public class AdditionalStructures implements ModInitializer {
 
-	public static final Logger LOGGER = LoggerFactory.getLogger("additionalstructures");
+    public static final Logger LOGGER = LoggerFactory.getLogger("additionalstructures");
 
-	@Override
-	public void onInitialize() {
-	}
-
+    @Override
+    public void onInitialize() {
+    }
 }

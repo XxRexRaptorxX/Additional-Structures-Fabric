@@ -112,6 +112,15 @@ tasks.register("createReleaseTag") {
     }
 }
 
+tasks.register("archiveChangelog") {
+    group = "changelog"
+    description = "Archive LATEST_CHANGELOG.md to CHANGELOG.md"
+
+    doLast {
+        archiveLatestChangelogIfPresent(project.mod_version)
+    }
+}
+
 // Automatically update changelog when building
 tasks.named("jar") {
     dependsOn("updateChangelog")
@@ -337,15 +346,25 @@ def archiveLatestChangelogIfPresent(String releaseVersion) {
         def parts = existing.split("(?m)^# Changelog\\s*")
         def body = parts.size() > 1 ? parts[1].trim() : ""
 
-        // append patch notes
-        def combined = header + "\n\n" + latestText + "\n\n" + body
+        // Create separator line
+        def separator = "\n---\n"
+
+        // append patch notes with separator
+        def combined
+        if (body.isEmpty()) {
+            // First entry, no separator needed
+            combined = header + "\n\n" + latestText
+        } else {
+            // Add separator between new version and existing content
+            combined = header + "\n\n" + latestText + separator + "\n" + body
+        }
 
         writeIfChanged(changelogFile, combined.trim() + "\n")
 
         println "✅ Inserted LATEST_CHANGELOG.md content"
 
         // reset LATEST_CHANGELOG.md
-        def gameVersions = project.findProperty("game_versions") ?: project.minecraft_version
+        def gameVersions = getFormattedGameVersions()
         def newHeader = "# v.${project.mod_version} for MC ${gameVersions}\n\n## 📝 Changes\n\n"
         def currentLatest = latestFile.exists() ? latestFile.getText('UTF-8') : ""
 
@@ -438,6 +457,15 @@ def createGitHubReleaseForVersion(String version) {
     }
 }
 
+def formatGameVersions(gameVersions) {
+    if (!gameVersions) return ""
+    return gameVersions.toString().replaceAll(/,\s*/, ', ')
+}
+
+ext.getFormattedGameVersions = {
+    def rawVersions = project.findProperty("game_versions") ?: project.minecraft_version
+    return formatGameVersions(rawVersions)
+}
 
 def buildChangelogForVersion(String version, List<String> devTags) {
     // Get commits for all dev tags of this version
@@ -484,7 +512,7 @@ def buildChangelogForVersion(String version, List<String> devTags) {
     }
 
     // Build changelog content
-    def gameVersions = project.findProperty("game_versions") ?: minecraft_version
+    def gameVersions = getFormattedGameVersions()
     def content = new StringBuilder()
 
     content.append("# Release v.${version} for MC ${gameVersions}\n\n")
@@ -607,7 +635,7 @@ def createAndPushReleaseTag() {
 
 def buildChangelogFromCommits(List commits) {
     def currentVersion = project.mod_version
-    def gameVersions = project.findProperty("game_versions") ?: minecraft_version
+    def gameVersions = getFormattedGameVersions()
     def dateFormat = new SimpleDateFormat("yyyy-MM-dd")
     def currentDate = dateFormat.format(new Date())
 
@@ -965,47 +993,6 @@ tasks.register("listDevTags") {
     }
 }
 
-// Task to remove dev hook
-tasks.register("removeAutoDevHook") {
-    group = "changelog"
-    description = "Remove the automatic dev tagging hooks and reset Git config"
-
-    doLast {
-        def preCommitHook = file(".githooks/pre-commit")
-        def postCommitHook = file(".githooks/post-commit")
-        def hooksDir = file(".githooks")
-
-        if (preCommitHook.exists()) {
-            preCommitHook.delete()
-            println "🗑️ Removed pre-commit hook"
-        }
-
-        if (postCommitHook.exists()) {
-            postCommitHook.delete()
-            println "🗑️ Removed post-commit hook"
-        }
-
-        // Remove the hooks directory if it's empty
-        if (hooksDir.exists() && hooksDir.list().length == 0) {
-            hooksDir.delete()
-            println "🗑️ Removed empty .githooks directory"
-        }
-
-        // Reset Git hooks path to default
-        try {
-            exec {
-                commandLine 'git', 'config', '--unset', 'core.hooksPath'
-                ignoreExitValue = true
-            }
-            println "🔄 Reset Git hooks path to default"
-        } catch (Exception e) {
-            println "ℹ️ Git hooks path was already at default"
-        }
-
-        println "✅ Automatic dev tagging hooks removed"
-    }
-}
-
 // Integration with existing functions - enhanced readLatestChangelog
 ext.readLatestChangelog = {
     // 1. Try reading from file first
@@ -1065,8 +1052,8 @@ ext.readLatestChangelog = {
 
     // 4. Final fallback
     logger.lifecycle("No changelog found - returning minimal changelog.")
-    return """# v.${project.mod_version} for MC ${project.minecraft_version}
-
+    def gameVersions = getFormattedGameVersions()
+    return """# v.${project.mod_version} for MC ${gameVersions}
 ## 📝 Changes
 
 - Initial release or changes not documented

@@ -25,6 +25,47 @@ tasks.register('checkGit') {
     }
 }
 
+// Task to remove dev hook
+tasks.register("removeAutoDevHook") {
+    group = "initialization"
+    description = "Remove the automatic dev tagging hooks and reset Git config"
+
+    doLast {
+        def preCommitHook = file(".githooks/pre-commit")
+        def postCommitHook = file(".githooks/post-commit")
+        def hooksDir = file(".githooks")
+
+        if (preCommitHook.exists()) {
+            preCommitHook.delete()
+            println "🗑️ Removed pre-commit hook"
+        }
+
+        if (postCommitHook.exists()) {
+            postCommitHook.delete()
+            println "🗑️ Removed post-commit hook"
+        }
+
+        // Remove the hooks directory if it's empty
+        if (hooksDir.exists() && hooksDir.list().length == 0) {
+            hooksDir.delete()
+            println "🗑️ Removed empty .githooks directory"
+        }
+
+        // Reset Git hooks path to default
+        try {
+            exec {
+                commandLine 'git', 'config', '--unset', 'core.hooksPath'
+                ignoreExitValue = true
+            }
+            println "🔄 Reset Git hooks path to default"
+        } catch (Exception e) {
+            println "ℹ️ Git hooks path was already at default"
+        }
+
+        println "✅ Automatic dev tagging hooks removed"
+    }
+}
+
 ext.requiredProps = [
         mod_id: "MOD",
         mod_name: "MOD",
@@ -580,6 +621,45 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Read mod name from gradle.properties
+        id: get_mod_name
+        run: |
+          MOD_NAME=$(grep "^mod_name=" gradle.properties | cut -d'=' -f2)
+          echo "mod_name=$MOD_NAME" >> $GITHUB_OUTPUT
+
+      - name: Build image and page URL from repo with fallbacks
+        id: get_repository_content
+        run: |
+          REPO="${{ github.repository }}"
+          PATH="src/main/resources/logo.png"
+          FALLBACK_PAGE="https://github.com/XxRexRaptorxX?tab=repositories"
+          FALLBACK_IMAGE="https://raw.githubusercontent.com/XxRexRaptorxX/General/refs/heads/main/icons/profile_pic.png"
+
+          if [ -f "${GITHUB_WORKSPACE}/${PATH}" ]; then
+            RAW_URL="https://raw.githubusercontent.com/${REPO}/${{ github.sha }}/${PATH}"
+            echo "image_url=${RAW_URL}" >> $GITHUB_OUTPUT
+            echo "page_url=https://github.com/${REPO}" >> $GITHUB_OUTPUT
+          else
+            echo "image_url=${FALLBACK_IMAGE}" >> $GITHUB_OUTPUT
+            echo "page_url=${FALLBACK_PAGE}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Discord message
+        uses: sarisia/actions-status-discord@v1
+        if: >
+          github.event.head_commit &&
+          (startsWith(github.event.head_commit.message, 'feat') ||
+            startsWith(github.event.head_commit.message, 'fix') ||
+            startsWith(github.event.head_commit.message, 'refactor'))
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          title: "New ${{ steps.get_mod_name.outputs.mod_name }} stuff is coming soon!"
+          url: ${{ steps.get_repository_content.outputs.page_url }}
+          image: ${{ steps.get_repository_content.image_url }}
+          username: Villager News
+          avatar_url: "https://github.com/XxRexRaptorxX/General/blob/main/page_decorations/villager_news.png?raw=true"
+          noprefix: true
+
       - name: Create release containing previous version's Dev tags
         uses: actions/github-script@v7
         with:
@@ -692,10 +772,188 @@ jobs:
 }
 
 
+tasks.register("setupFormatter") {
+    group = "initialization"
+    description = "Generates the eclipse-java-formatter.xml"
+
+    doLast {
+        def workflowFile = new File("eclipse-java-formatter.xml")
+
+        if (workflowFile.exists()) {
+            println("✅ The Formatter file 'eclipse-java-formatter.xml' already exists. No action taken.")
+            return
+        }
+
+        println("⚠️ The formatter file 'eclipse-java-formatter.xml' does not exist.")
+
+        workflowFile.text = '''\
+<?xml version="1.0" encoding="UTF-8"?>
+<profiles version="13">
+    <profile kind="CodeFormatterProfile" name="PalantirLike" version="13">
+
+        <!-- ====================================================================================== -->
+        <!-- LINE LENGTH AND WRAPPING SETTINGS                                                     -->
+        <!-- ====================================================================================== -->
+
+        <!-- Maximum line length before wrapping -->
+        <setting id="org.eclipse.jdt.core.formatter.lineSplit" value="180"/>
+
+        <!-- Comment line length -->
+        <setting id="org.eclipse.jdt.core.formatter.comment.line_length" value="180"/>
+
+        <!-- Continuation indentation for wrapped lines -->
+        <setting id="org.eclipse.jdt.core.formatter.continuation_indentation" value="2"/>
+        <setting id="org.eclipse.jdt.core.formatter.continuation_indentation_for_array_initializer" value="2"/>
+
+        <!-- ====================================================================================== -->
+        <!-- INDENTATION AND TABS                                                                  -->
+        <!-- ====================================================================================== -->
+
+        <!-- Use spaces instead of tabs -->
+        <setting id="org.eclipse.jdt.core.formatter.tabulation.char" value="space"/>
+
+        <!-- Tab size and indentation size (4 spaces) -->
+        <setting id="org.eclipse.jdt.core.formatter.tabulation.size" value="4"/>
+        <setting id="org.eclipse.jdt.core.formatter.indentation.size" value="4"/>
+
+        <!-- ====================================================================================== -->
+        <!-- BRACE POSITIONING (K&R Style)                                                         -->
+        <!-- ====================================================================================== -->
+
+        <!-- Opening braces on same line (K&R style) -->
+        <setting id="org.eclipse.jdt.core.formatter.brace_position_for_type_declaration" value="END_OF_LINE"/>
+        <setting id="org.eclipse.jdt.core.formatter.brace_position_for_method_declaration" value="END_OF_LINE"/>
+        <setting id="org.eclipse.jdt.core.formatter.brace_position_for_block" value="END_OF_LINE"/>
+
+        <!-- Space before opening brace in blocks -->
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_block" value="true"/>
+
+        <!-- ====================================================================================== -->
+        <!-- LAMBDA EXPRESSIONS                                                                     -->
+        <!-- ====================================================================================== -->
+
+        <!-- Keep lambda body on one line if it's a single item -->
+        <setting id="org.eclipse.jdt.core.formatter.keep_lambda_body_block_on_one_line" value="one_line_if_single_item"/>
+
+        <!-- Spaces around lambda arrow -->
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_before_lambda_arrow" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_after_lambda_arrow" value="insert"/>
+
+        <!-- ====================================================================================== -->
+        <!-- CONTROL STRUCTURES                                                                     -->
+        <!-- ====================================================================================== -->
+
+        <!-- Keep simple if/else statements compact -->
+        <setting id="org.eclipse.jdt.core.formatter.keep_then_statement_on_same_line" value="true"/>
+        <setting id="org.eclipse.jdt.core.formatter.keep_else_statement_on_same_line" value="true"/>
+        <setting id="org.eclipse.jdt.core.formatter.keep_simple_if_on_one_line" value="true"/>
+
+        !-- Spaces before opening brace for control blocks -->
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_if" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_else" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_for" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_while" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_switch" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_catch" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_try" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_synchronized" value="insert"/>
+
+        <!-- Methods / constructors / blocks -->
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_method_declaration" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_constructor_declaration" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_block" value="insert"/>
+
+        <!-- Spaces between methods -->
+        <setting id="org.eclipse.jdt.core.formatter.number_of_empty_lines_to_preserve" value="1"/>
+        <setting id="org.eclipse.jdt.core.formatter.blank_lines_before_method" value="2"/>
+        <setting id="org.eclipse.jdt.core.formatter.blank_lines_before_abstract_method" value="2"/>
+
+        <!-- ====================================================================================== -->
+        <!-- METHOD AND CONSTRUCTOR DECLARATIONS                                                    -->
+        <!-- ====================================================================================== -->
+
+        <!-- No space before parentheses in method/constructor declarations and invocations -->
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_method_invocation" value="do not insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_method_declaration" value="do not insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_constructor_declaration" value="do not insert"/>
+
+        <!-- ====================================================================================== -->
+        <!-- COMMA SPACING                                                                          -->
+        <!-- ====================================================================================== -->
+
+        <!-- Always insert space after commas -->
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_after_comma_in_method_declaration_parameters" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_after_comma_in_method_declaration_throws" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_after_comma_in_method_invocation_arguments" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_after_comma_in_constructor_declaration_parameters" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_after_comma_in_allocation_expression" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_after_comma_in_enum_declarations" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_after_comma_in_multiple_local_declarations" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_after_comma_in_multiple_field_declarations" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_after_comma_in_type_parameters" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_after_comma_in_type_arguments" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_after_comma_in_annotation" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_after_comma_in_for_increments" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_space_after_comma_in_for_inits" value="insert"/>
+
+        <!-- ====================================================================================== -->
+        <!-- ENUM FORMATTING                                                                        -->
+        <!-- ====================================================================================== -->
+
+        <!-- Force each enum constant on a separate line (alignment value 49) -->
+        <setting id="org.eclipse.jdt.core.formatter.alignment_for_enum_constants" value="49"/>
+
+        <!-- Wrap enum constant arguments only when necessary (alignment value 16) -->
+        <setting id="org.eclipse.jdt.core.formatter.alignment_for_arguments_in_enum_constant" value="16"/>
+
+        <!-- Insert new lines in empty enum declarations and constants -->
+        <setting id="org.eclipse.jdt.core.formatter.insert_new_line_in_empty_enum_constant" value="insert"/>
+        <setting id="org.eclipse.jdt.core.formatter.insert_new_line_in_empty_enum_declaration" value="insert"/>
+
+        <!-- ====================================================================================== -->
+        <!-- JAVADOC AND COMMENT FORMATTING                                                        -->
+        <!-- ====================================================================================== -->
+
+        <!-- Enable formatting of Javadoc and block comments -->
+        <setting id="org.eclipse.jdt.core.formatter.comment.format_javadoc_comments" value="true"/>
+        <setting id="org.eclipse.jdt.core.formatter.comment.format_block_comments" value="true"/>
+        <setting id="org.eclipse.jdt.core.formatter.comment.format_source_code" value="true"/>
+
+        <!-- Keep @param and description on same line -->
+        <setting id="org.eclipse.jdt.core.formatter.comment.insert_new_line_for_parameter" value="do not insert"/>
+
+        <!-- Don't indent parameter descriptions (keep them aligned with @param) -->
+        <setting id="org.eclipse.jdt.core.formatter.comment.indent_parameter_description" value="false"/>
+
+        <!-- Don't align Javadoc tags in groups or columns (prevents strange spacing) -->
+        <setting id="org.eclipse.jdt.core.formatter.comment.align_tags_descriptions_grouped" value="false"/>
+        <setting id="org.eclipse.jdt.core.formatter.comment.align_tags_names_descriptions" value="false"/>
+
+        <!-- Don't indent root tags (@param, @return, etc.) -->
+        <setting id="org.eclipse.jdt.core.formatter.comment.indent_root_tags" value="false"/>
+
+        <!-- ====================================================================================== -->
+        <!-- MISCELLANEOUS SETTINGS                                                                -->
+        <!-- ====================================================================================== -->
+
+        <!-- Preserve up to 2 consecutive empty lines -->
+        <setting id="org.eclipse.jdt.core.formatter.number_of_empty_lines_to_preserve" value="2"/>
+
+        <!-- Formatter disable tag for selective formatting control -->
+        <setting id="org.eclipse.jdt.core.formatter.disabling_tag" value="@formatter:off"/>
+
+    </profile>
+</profiles>
+'''
+
+        println("✅ Formatter file 'eclipse-java-formatter.xml' has been generated.")
+    }
+}
+
 tasks.register('#initProject') {
     group = "initialization"
     description = "Initializes the project (runs init script)"
-    dependsOn checkGit, checkGradleProperties, setupGitattributes, setupGitHooks, setupGithubWorkflow, setupChangelogs, setupVersionsJson, createGitTag, createReadme
+    dependsOn checkGit, checkGradleProperties, setupGitattributes, setupGitHooks, setupGithubWorkflow, setupChangelogs, setupVersionsJson, setupFormatter, createGitTag, createReadme
     doLast {
         println "\n🎉 Project successfully initialized!"
         println "📋 Next steps:"

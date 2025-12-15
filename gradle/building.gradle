@@ -7,10 +7,18 @@ tasks.named('jar').configure {
     archiveVersion.set("${minecraft_version}-(v.${mod_version}-${mod_loader})")
 }
 
+tasks.matching { it.name == 'runData' }.configureEach {
+    finalizedBy('spotlessApply')
+}
+
+tasks.matching { it.name == 'runClient' }.configureEach {
+    dependsOn('spotlessApply')
+}
+
 spotless {
     java {
         target 'src/**/*.java'
-        palantirJavaFormat('2.38.0')
+        eclipse().configFile("${rootDir}/eclipse-java-formatter.xml")
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
