@@ -13,7 +13,7 @@
 
 ## 📖 Description
 
-This mod adds ~155 new small and medium-sized structures into the game to expand your world!
+This mod adds ~250 new small and medium-sized structures into the game to expand your world!
 
 - supports biome generation mods, like Terralith, Traverse, Biomes O' Plenty, Biome Bundle and more!
 - works with the /locate command
