@@ -1,6 +1,6 @@
 {
-  "start_pool": "additionalstructures:temple_1",
-  "biomes": "#additionalstructures:has_structure/temple_desert",
+  "start_pool": "additionalstructures:skulls_1",
+  "biomes": "#additionalstructures:has_structure/skeleton_skull",
   "type": "minecraft:jigsaw",
   "step": "surface_structures",
   "project_start_to_heightmap": "WORLD_SURFACE_WG",
