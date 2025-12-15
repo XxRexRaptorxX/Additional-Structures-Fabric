@@ -66,6 +66,18 @@ Do you use Fabric or Quilt? Then use [this version](https://www.curseforge.com/m
   <img src="https://github.com/XxRexRaptorxX/General/blob/main/page_decorations/line.png?raw=true" alt="line" width="2000"/>
 </p>
 
+
+## 🗃️ Dependencies
+
+### Supported:
+- **Antique Atlas** [≥ MC 1.21]
+    - Map marker for some structures on the map
+    - [CurseForge][cf_aa] | [Modrinth][mr_aa]
+
+<p align="center">
+  <img src="https://github.com/XxRexRaptorxX/General/blob/main/page_decorations/line.png?raw=true" alt="line" width="2000"/>
+</p>
+
 ## 🎮 My other mods!
 
 <p align="center">
@@ -110,3 +122,5 @@ Do you use Fabric or Quilt? Then use [this version](https://www.curseforge.com/m
   <a href="https://bisecthosting.com/REXRAPTOR"><img src="https://github.com/XxRexRaptorxX/General/blob/main/BH_REX_Bisect.png?raw=true" alt="Bisect Hosting - 25% off with code: REXRAPTOR"/></a>
 </p>
 
+[cf_aa]: https://www.curseforge.com/minecraft/mc-mods/antique-atlas
+[mr_aa]: https://modrinth.com/mod/antique-atlas-4
