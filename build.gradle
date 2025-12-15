@@ -1,116 +1,208 @@
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+
 plugins {
-	id 'fabric-loom' version '1.7.1'
-	id 'maven-publish'
+    id 'fabric-loom' version '1.10.1'
+    id 'java-library'
+    id 'maven-publish'
+    id 'idea'
+    id 'com.modrinth.minotaur' version '2.+'
+    id 'net.darkhax.curseforgegradle' version '1.1.26'
+    id 'com.diffplug.spotless' version '6.25.0'
 }
+
+apply from: "$rootDir/gradle/dependencies.gradle"
+apply from: "$rootDir/gradle/changelogs.gradle"
+apply from: "$rootDir/gradle/publishing.gradle"
+apply from: "$rootDir/gradle/building.gradle"
+apply from: "$rootDir/gradle/initialization.gradle"
+apply from: "$rootDir/gradle/debugging.gradle"
+
+// ========================================
+// PROJECT CONFIGURATION
+// ========================================
 
 version = project.mod_version
 group = project.maven_group
 mod_name = project.mod_name
 fabric_version_range = project.fabric_version_range
-mc_version_range = project.mc_version_range
+minecraft_version_range = project.minecraft_version_range
 java_version_range = project.java_version_range
 
 base {
-	archivesName = project.mod_id
-}
-
-repositories {
-	maven {
-		// location of the maven that hosts JEI files since January 2023
-		name = "Jared's maven"
-		url = "https://maven.blamejared.com/"
-	}
-	maven {
-		// location of a maven mirror for JEI files, as a fallback
-		name = "ModMaven"
-		url = "https://modmaven.dev"
-	}
-
-	// curse maven
-	maven {
-		url "https://cursemaven.com"
-		content {
-			includeGroup "curse.maven"
-		}
-	}
+    archivesName = project.mod_id
 }
 
 fabricApi {
-	configureDataGeneration()
+    configureDataGeneration()
 }
 
-dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.mc_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-	// compile against the JEI API but do not include it at runtime
-	modCompileOnlyApi("mezz.jei:jei-${project.mc_version}-common-api:${project.jei_version}")
-	modCompileOnlyApi("mezz.jei:jei-${project.mc_version}-fabric-api:${project.jei_version}")
-	// at runtime, use the full JEI jar for Fabric
-	modRuntimeOnly("mezz.jei:jei-${project.mc_version}-fabric:${project.jei_version}")
-
-	//other dependencies
-	modImplementation "curse.maven:jade-324717:${project.jade_version}"
-
-}
+// ========================================
+// MOD METADATA GENERATION
+// ========================================
 
 processResources {
-	inputs.property "mod_version", version
-	inputs.property "mod_name", mod_name
-	inputs.property "mod_id", mod_id
-	inputs.property "fabric_version_range", fabric_version_range
-	inputs.property "mc_version_range", mc_version_range
-	inputs.property "java_version_range", java_version_range
+    inputs.property "mod_version", version
+    inputs.property "mod_name", mod_name
+    inputs.property "mod_id", mod_id
+    inputs.property "fabric_version_range", fabric_version_range
+    inputs.property "minecraft_version_range", minecraft_version_range
+    inputs.property "java_version_range", java_version_range
 
-	filesMatching("fabric.mod.json") {
-		expand "mod_version": version, "mod_id": mod_id, "mod_name": mod_name, "fabric_version_range": fabric_version_range,
-				"mc_version_range": mc_version_range, "java_version_range": java_version_range
-	}
+    filesMatching("fabric.mod.json") {
+        expand "mod_version": version, "mod_id": mod_id, "mod_name": mod_name, "fabric_version_range": fabric_version_range,
+                "minecraft_version_range": minecraft_version_range, "java_version_range": java_version_range
+    }
 }
 
+// ========================================
+// BUILD & FORMATTING
+// ========================================
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
+    it.options.release = 21
 }
 
 java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
-	withSourcesJar()
+    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+    // if it is present.
+    // If you remove this line, sources will not be generated.
+    //withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = project.java_version
+    targetCompatibility = project.java_version
 }
 
 jar {
-	from("LICENSE.txt") {
-		rename { "${it}_${project.base.archivesName.get()}"}
-	}
-}
-
-// configure the maven publication
-publishing {
-	publications {
-		create("mavenJava", MavenPublication) {
-			artifactId = project.mod_id
-			from components.java
-		}
-	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
-	}
+    from("LICENSE.md") {
+        rename { "${it}_${project.base.archivesName.get()}"}
+    }
 }
 
 //Dummy task to fix post sync error caused by NeoGradle
 tasks.register("idePostSync") {
+}
+
+// ========================================
+// MAVEN PUBLISHING
+// ========================================
+
+// configure the maven publication
+publishing {
+    publications {
+        create("mavenJava", MavenPublication) {
+            artifactId = project.mod_id
+            from components.java
+        }
+    }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+        // Notice: This block does NOT have the same function as the block in the top level.
+        // The repositories here will be used for publishing your artifact, not for
+        // retrieving dependencies.
+    }
+}
+
+
+// ========================================
+// PLATFORM PUBLISHING
+// ========================================
+
+// Modrinth Configuration
+def rawGameVersions = project.findProperty("game_versions")?.toString() ?: ""
+def parsedGameVersions = rawGameVersions.split(",").collect { it.trim() }
+
+afterEvaluate {
+    modrinth {
+        token = System.getenv("MODRINTH_TOKEN") ?: project.findProperty("modrinthToken")?.toString()
+        projectId = mr_id
+        versionName = "v.${mod_version}-${mod_loader}"
+        versionNumber = "v.${mod_version}"
+        versionType = release_type
+        uploadFile = jar
+        loaders = ["fabric","quilt"]
+        gameVersions = parsedGameVersions
+        changelog = readLatestChangelog()
+        failSilently = true
+        syncBodyFrom = rootProject.file("README.md").text
+        dependencies {
+            optional.project "antique-atlas"
+        }
+    }
+}
+
+
+// CurseForge Configuration
+tasks.register('publishCurseForge', TaskPublishCurseForge) {
+    def tokens = validateTokens()
+    apiToken = tokens[1] // CurseForge token
+
+    def mainFile = upload(project.findProperty("cf_id") as Integer, jar)
+    mainFile.displayName = "${mod_name.replace(' ', '')} v.${mod_version}"
+    mainFile.releaseType = release_type
+    mainFile.changelog = readLatestChangelog()
+    mainFile.changelogType = 'markdown'
+    mainFile.addModLoader('Fabric')
+    mainFile.addJavaVersion("Java ${java_version}")
+    parsedGameVersions.each { version ->
+        mainFile.addGameVersion(version)
+    }
+    mainFile.addEnvironment()
+    environment_type.split(',').each { env ->
+        mainFile.addEnvironment(env.trim())
+    }
+}
+
+// Changelog reading
+String readLatestChangelog() {
+    //1. from workspace
+    def file = rootProject.file("LATEST_CHANGELOG.md")
+    if (file.exists()) {
+        try {
+            def text = file.getText('UTF-8').trim()
+            if (text) {
+                logger.lifecycle("Using changelog from file: ${file}")
+                return text
+            } else {
+                logger.lifecycle("LATEST_CHANGELOG.md exists but is empty.")
+            }
+        } catch (Exception e) {
+            logger.warn("Error from reading LATEST_CHANGELOG.md: ${e.message}")
+        }
+    } else {
+        logger.lifecycle("LATEST_CHANGELOG.md not found in project root.")
+    }
+
+    //2. from Git-HEAD
+    try {
+        ByteArrayOutputStream stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'show', 'HEAD:LATEST_CHANGELOG.md'
+            standardOutput = stdout
+            // don't fail build if git command fails
+            ignoreExitValue = true
+        }
+        def gitText = stdout.toString('UTF-8').trim()
+        if (gitText) {
+            logger.lifecycle("Using changelog from git HEAD:LATEST_CHANGELOG.md")
+            return gitText
+        } else {
+            logger.lifecycle("No LATEST_CHANGELOG.md content found at git HEAD.")
+        }
+    } catch (Exception e) {
+        logger.warn("Error from executing 'git show': ${e.message}")
+    }
+
+    // 3. fallback
+    try {
+        def generated = generateLatestChangelog()
+        logger.lifecycle("Using generated changelog (fallback).")
+        return generated
+    } catch (Exception e) {
+        logger.warn("generateLatestChangelog() failed: ${e.message}")
+    }
+
+    logger.lifecycle("No changelog found — returning empty string.")
+    return ""
 }
