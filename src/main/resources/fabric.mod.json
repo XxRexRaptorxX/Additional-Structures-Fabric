@@ -18,9 +18,9 @@
       }
     }
   },
-  "license": "All rights reserved.",
+  "license": "${mod_license}",
   "icon": "assets/additionalstructures/icon.png",
-  "environment": "*",
+  "environment": "${environment_type}",
   "entrypoints": {
     "main": [
       "xxrexraptorxx.additionalstructures.AdditionalStructures"
