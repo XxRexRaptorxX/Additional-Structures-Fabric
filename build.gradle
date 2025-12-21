@@ -51,7 +51,7 @@ processResources {
 
     filesMatching("fabric.mod.json") {
         expand "mod_version": version, "mod_id": mod_id, "mod_name": mod_name, "fabric_version_range": fabric_version_range,
-                "minecraft_version_range": minecraft_version_range, "java_version_range": java_version_range
+                "minecraft_version_range": minecraft_version_range, "java_version_range": java_version_range, "environment_type": environment_type
     }
 }
 
