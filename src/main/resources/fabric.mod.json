@@ -5,19 +5,8 @@
   "name": "${mod_name}",
   "description": "This mod adds a lot new small and medium sized structures into the game to expand your world!",
   "authors": [
-    "XxRexRaptorxX"
+    "XxRexRaptorxX (RexRaptor)"
   ],
-  "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/additional-structures-fabric",
-    "sources": "https://github.com/XxRexRaptorxX/Additional-Structures-Fabric"
-  },
-  "custom": {
-    "modmenu": {
-      "links": {
-        "modmenu.discord": "https://discord.com/invite/ycRJJk8EXV"
-      }
-    }
-  },
   "license": "${mod_license}",
   "icon": "assets/additionalstructures/icon.png",
   "environment": "${environment_type}",
@@ -26,6 +15,29 @@
       "xxrexraptorxx.additionalstructures.AdditionalStructures"
     ]
   },
+
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/additional-structures-fabric",
+    "sources": "https://github.com/XxRexRaptorxX/Additional-Structures-Fabric",
+    "issues": "https://legacy.curseforge.com/minecraft/mc-mods/additional-structures-fabric/issues"
+  },
+
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.curseforge": "https://www.curseforge.com/minecraft/mc-mods/additional-structures-fabric",
+        "modmenu.modrinth": "https://modrinth.com/mod/additional-structures",
+        "modmenu.discord": "https://discord.com/invite/ycRJJk8EXV",
+        "modmenu.buymeacoffee": "https://ko-fi.com/xxrexraptorxx",
+        "modmenu.donate": "https://www.paypal.com/cgi-bin/webscr?return=https://www.curseforge.com/minecraft/mc-mods/additional-structures-fabric&cn=Add+special+instructions+to+the+addon+author()&business=Simon%40Biebl-Haustechnik.de&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted&cancel_return=https://www.curseforge.com/minecraft/mc-mods/additional-structures-fabric&lc=US&item_name=Additional+Structures+(Fabric%2fQuilt)+(from+www.curseforge.com)&cmd=_donations&rm=1&no_shipping=1&currency_code=USD",
+        "modmenu.patreon": "https://www.patreon.com/bePatron?u=75131568",
+        "modmenu.twitter": "https://x.com/XxRexRaptorxX"
+      },
+      "badges": [],
+      "update_checker": true
+    }
+  },
+
   "depends": {
     "fabricloader": "${fabric_version_range}",
     "minecraft": "${minecraft_version_range}",

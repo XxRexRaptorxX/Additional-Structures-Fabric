@@ -3,7 +3,7 @@
   <a href="https://www.curseforge.com/minecraft/mc-mods/additional-structures-fabric"><img src="http://cf.way2muchnoise.eu/short_585782_Fabric.svg?badge_style=flat" alt="Curseforge"></a> 
   <a href="https://modrinth.com/mod/additional-structures"><img src="https://img.shields.io/modrinth/dt/additional-structures?logo=modrinth&label=&suffix=%20&style=flat&color=242629&labelColor=5ca424&logoColor=1c1c1c" alt="Modrinth"></a>
   <a href="https://www.curseforge.com/minecraft/mc-mods/additional-structures"><img src="https://cf.way2muchnoise.eu/versions/297680(266fff).svg?badge_style=flat" alt="Supported Versions"></a>
-  <a href="https://discord.gg/hmaD7Se"><img src="https://img.shields.io/discord/523112426913267713?color=282828&logo=discord&style=flat&label=&labelColor=B6BCEA" alt="Discord"></a>
+  <a href="https://discord.gg/ycRJJk8EXV"><img src="https://img.shields.io/discord/523112426913267713?color=282828&logo=discord&style=flat&label=&labelColor=B6BCEA" alt="Discord"></a>
 </p>
 <p align="center">
   <img src="https://github.com/XxRexRaptorxX/Additional-Structures/blob/master/src/main/resources/logo.png?raw=true" alt="logo" width="500"/><br>
@@ -25,7 +25,7 @@ Want to modify or change some structure values on 1.18+? [Here's how to do it!](
 
 [Here can you find all structures of the current version](https://www.curseforge.com/minecraft/mc-mods/additional-structures/pages/structures)!
 
-Do you use Fabric or Quilt? Then use [this version](https://www.curseforge.com/minecraft/mc-mods/additional-structures-fabric)!
+Do you use (Neo-)Forge? Then use [this version](https://www.curseforge.com/minecraft/mc-mods/additional-structures)!
 
 <p align="center">
 <br><br>
